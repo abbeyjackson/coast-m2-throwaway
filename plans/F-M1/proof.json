@@ -1,0 +1,68 @@
+{
+  "base_commit": "4db0eb1d3ec0b7c389a83c43746a361cd440b4e2",
+  "export_seq": 28,
+  "exported_at": "2026-07-17T23:32:32.266Z",
+  "feature_id": "F-M1",
+  "items": [
+    {
+      "content_hash": "sha256:e59af53331abf29c62f92084f8075bef3d8cca65333a51fd534d28490fbe5f24",
+      "description": "Public struct/class `Greeter` with method `greet(name: String) -> String` returning \"Hello, <name>!\" and `greet() -> String` returning \"Hello, world!\"",
+      "item_id": "F-M1-i001",
+      "kind": "type",
+      "origin": "plan",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift",
+      "verdicts": [
+        {
+          "agent_identity": {
+            "model": "claude-sonnet-5",
+            "provider": "anthropic"
+          },
+          "approval_id": "eef03e53-952c-4947-92a3-19089d0ee753",
+          "approver_role": "architect",
+          "item_content_hash": "sha256:e59af53331abf29c62f92084f8075bef3d8cca65333a51fd534d28490fbe5f24",
+          "plan_version": 1,
+          "rules_checked": [
+            {
+              "reasoning": "Declared kind is 'type' and the item defines a concrete Swift struct/class with two methods — this is exactly a type declaration, not a protocol, extension, or free function. Kind matches what is actually being built.",
+              "rule": "A-KIND"
+            },
+            {
+              "reasoning": "Target is Sources/Greeter/Greeter.swift, inside the Greeter target defined in Package.swift (.target(name: \"Greeter\")). This is the sole module in the package and the natural home for the Greeter type; the acceptance criteria also require @testable import Greeter to see it, confirming the module is correct.",
+              "rule": "A-MODULE"
+            },
+            {
+              "reasoning": "Greeter is a plain value/service type producing greeting strings with no UI or persistence involved — there are no views or view models in this package, so no altitude violation (no domain logic in views, no data access from view models) is possible or present here.",
+              "rule": "A-ALTITUDE"
+            },
+            {
+              "reasoning": "This is the first substantive type in a fresh scaffold module (only GreeterModule.swift, an empty namespace marker, exists so far). A new file for the new type is warranted rather than shoehorning it into the placeholder marker enum; granularity matches the single well-defined responsibility (producing greetings).",
+              "rule": "A-GRAIN"
+            },
+            {
+              "reasoning": "The item introduces a concrete struct/class only — no protocol is proposed. No speculative abstraction is being introduced, so this rule is satisfied trivially (nothing to flag).",
+              "rule": "A-PROTO"
+            },
+            {
+              "reasoning": "`Greeter` is a noun naming a thing that greets, following Swift API Design Guidelines for type names. `greet(name:)` and `greet()` are verb-named methods matching Swift's guideline that mutating/action methods use base verb form; parameter label `name` is clear and unabbreviated.",
+              "rule": "A-NAMING"
+            },
+            {
+              "reasoning": "The type is self-contained within Sources/Greeter with no described imports of other modules or forbidden dependencies; Package.swift shows Greeter has no external dependencies, so no dependency-direction or forbidden-import issue arises.",
+              "rule": "A-COUPLING"
+            }
+          ],
+          "supersedes": null,
+          "timestamp": "2026-07-17T23:32:28.199Z",
+          "trigger": "initial",
+          "verdict": "approved"
+        }
+      ]
+    }
+  ],
+  "plan_file_hash": "sha256:804b5546eb4a5fbfe727769206a5ffe3e7f301c523283ddc0e1d292e7bc500c9",
+  "plan_version": 1,
+  "proof_schema_version": 1,
+  "purpose": "plan-pr",
+  "superseded_items": []
+}

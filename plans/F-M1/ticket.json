@@ -1,0 +1,6 @@
+{
+  "description": "Add a Greeter service to the Greeter module: a public type `Greeter` in Sources/Greeter/Greeter.swift with `greet(name: String) -> String` returning \"Hello, <name>!\" and `greet() -> String` returning \"Hello, world!\". Unit tests live in Tests/GreeterTests/.",
+  "feature_id": "F-M1",
+  "ticket_ref": "T-M1",
+  "ticket_schema_version": 1
+}
