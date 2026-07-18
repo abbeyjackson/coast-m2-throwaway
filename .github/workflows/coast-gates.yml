@@ -29,8 +29,41 @@ jobs:
     container: swift:6.0
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the plans-only detector diffs against the base
+      # Cost seam (benchmark follow-up, 2026-07-17): a diff touching only
+      # Coast's bookkeeping (plans/**) cannot change the suite's result — the
+      # source tree is byte-identical to one already verified green (the plan
+      # PR, and the push to main when it merges). Guarded and fail-open: any
+      # diff-computation trouble falls through to running the suite.
+      - name: Detect a plans-only diff
+        id: plansonly
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            RANGE="${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
+          else
+            RANGE="${{ github.event.before }}..${{ github.event.after }}"
+          fi
+          SKIP=false
+          if CHANGED=$(git diff --name-only "$RANGE" 2>/dev/null) && [ -n "$CHANGED" ] \
+             && ! echo "$CHANGED" | grep -qv '^plans/'; then
+            SKIP=true
+          fi
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+      - name: Cache SPM build
+        if: steps.plansonly.outputs.skip != 'true'
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
       - name: Build and test
+        if: steps.plansonly.outputs.skip != 'true'
         run: swift test
+      - name: Plans-only diff — suite verdict carried from the verified base
+        if: steps.plansonly.outputs.skip == 'true'
+        run: echo "Only plans/** changed; the source tree matches one already verified green. Success without re-running the suite."
 
   # The reviewer identity (github-actions[bot], config A1 from the F5
   # research). Plan PRs (S6): the deterministic gates ARE the plan's checks —
