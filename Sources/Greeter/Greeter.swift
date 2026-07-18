@@ -1,14 +1,14 @@
-/// Public greeting type (stub — real logic arrives with the implementation).
+/// Public greeting type.
 public struct Greeter {
     public init() {}
 
-    /// Stub: intentionally wrong placeholder value.
+    /// Returns a personalized greeting for the given name.
     public func greet(name: String) -> String {
-        "TODO"
+        "Hello, \(name)!"
     }
 
-    /// Stub: intentionally wrong placeholder value.
+    /// Returns the default greeting.
     public func greet() -> String {
-        "TODO"
+        "Hello, world!"
     }
 }
