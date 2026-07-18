@@ -1,14 +1,12 @@
-/// Minimal stub — placeholder implementation to be replaced by the real
-/// greeting logic. Deliberately returns obviously-wrong values so the
-/// requirement tests fail until implemented.
+/// Produces friendly greeting messages.
 public struct Greeter {
     public init() {}
 
     public func greet(name: String) -> String {
-        "TODO"
+        "Hello, \(name)!"
     }
 
     public func greet() -> String {
-        "TODO"
+        "Hello, world!"
     }
 }
