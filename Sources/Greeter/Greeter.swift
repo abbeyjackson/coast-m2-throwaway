@@ -4,11 +4,11 @@ public struct Greeter {
 
     /// Returns a greeting for the given name.
     public func greet(name: String) -> String {
-        "TODO"
+        "Hello, \(name)!"
     }
 
     /// Returns a default greeting.
     public func greet() -> String {
-        "TODO"
+        "Hello, world!"
     }
 }
