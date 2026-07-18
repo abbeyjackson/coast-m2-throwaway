@@ -1,19 +1,18 @@
-/// Minimal stub for the planned `Greeter` service.
+/// A minimal greeting service (see docs/features/F-M1/explainer.md).
 ///
-/// This is a placeholder implementation only: it exists so that the
-/// requirement tests in `Tests/GreeterTests/GreeterTests.swift` compile
-/// and fail, locking in the acceptance criteria this type must satisfy
-/// once implemented for real (see docs/features/F-M1/explainer.md).
+/// `Greeter` produces friendly, personalized greetings when given a name,
+/// and falls back to a generic "world" greeting when no name is given.
 public struct Greeter {
     public init() {}
 
-    /// Placeholder — deliberately does NOT implement "Hello, <name>!".
+    /// Returns a personalized greeting for the given `name`, e.g. "Hello, Ada!".
+    /// An empty string produces "Hello, !".
     public func greet(name: String) -> String {
-        "TODO: not implemented"
+        "Hello, \(name)!"
     }
 
-    /// Placeholder — deliberately does NOT implement "Hello, world!".
+    /// Returns the default greeting, "Hello, world!".
     public func greet() -> String {
-        "TODO: not implemented"
+        "Hello, world!"
     }
 }
