@@ -75,6 +75,15 @@ def call_model(system, messages):
         })
     with urllib.request.urlopen(request, timeout=300) as response:
         payload = json.load(response)
+    usage = payload.get("usage", {})
+    # Metering line for the job log: reviewer calls run here on the customer's
+    # key, outside the sidecar's cost stream, so this is where they're counted.
+    print(f"COAST-REVIEW-USAGE model={MODEL}"
+          f" input_tokens={usage.get('input_tokens', 0)}"
+          f" output_tokens={usage.get('output_tokens', 0)}"
+          f" cache_read_input_tokens={usage.get('cache_read_input_tokens', 0)}"
+          f" cache_creation_input_tokens={usage.get('cache_creation_input_tokens', 0)}",
+          flush=True)
     return "".join(block.get("text", "") for block in payload.get("content", []))
 
 
