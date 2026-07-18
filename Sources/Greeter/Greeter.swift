@@ -1,12 +1,12 @@
-/// Public greeting type (stub — real logic arrives with the implementation).
+/// Public greeting type.
 public struct Greeter {
     public init() {}
 
     public func greet(name: String) -> String {
-        "TODO_NOT_IMPLEMENTED"
+        "Hello, \(name)!"
     }
 
     public func greet() -> String {
-        "TODO_NOT_IMPLEMENTED"
+        "Hello, world!"
     }
 }
