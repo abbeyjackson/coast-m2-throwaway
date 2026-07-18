@@ -1,0 +1,40 @@
+{
+  "acceptance_criteria": [
+    {
+      "given": "a Greeter instance",
+      "then": "it returns \"Hello, Ada!\"",
+      "when": "greet(name:) is called with \"Ada\""
+    },
+    {
+      "given": "a Greeter instance",
+      "then": "it returns \"Hello, world!\"",
+      "when": "greet() is called with no arguments"
+    },
+    {
+      "given": "a Greeter instance",
+      "then": "it returns \"Hello, !\"",
+      "when": "greet(name:) is called with an empty string"
+    }
+  ],
+  "base_commit": "47e44f32cfa98d76c8e4a5627bb6034cb6f2dfbd",
+  "db_change": false,
+  "declared_scope": [
+    "Sources/Greeter/Greeter.swift",
+    "Tests/GreeterTests/**",
+    "docs/features/F-M1/**"
+  ],
+  "feature_id": "F-M1",
+  "items": [
+    {
+      "content_hash": "sha256:512addad5e797abd714a2d39ce89f6fca80af91a485e5450d851c88367f6f301",
+      "description": "Public struct/type `Greeter` with `greet(name: String) -> String` returning \"Hello, <name>!\" and `greet() -> String` returning \"Hello, world!\"",
+      "item_id": "F-M1-i001",
+      "kind": "type",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift"
+    }
+  ],
+  "plan_schema_version": 1,
+  "plan_version": 1,
+  "ticket_ref": "T-M1"
+}
