@@ -94,7 +94,10 @@ jobs:
       - name: Determine PR purpose from the proof file
         id: purpose
         run: |
-          FEATURE_ID="${GITHUB_HEAD_REF#feature/}"
+          # Identity from the PR's content, never the branch name (the
+          # branch format is a per-project setting — round 23).
+          FEATURE_ID=$(git diff --name-only "${{ github.event.pull_request.base.sha }}".."${{ github.event.pull_request.head.sha }}" -- plans/ | awk -F/ 'NF>=3 {print $2}' | sort -u)
+          test "$(echo "$FEATURE_ID" | wc -w)" -eq 1
           PURPOSE=$(python3 -c "import json; print(json.load(open('plans/$FEATURE_ID/proof.json'))['purpose'])")
           echo "purpose=$PURPOSE" >> "$GITHUB_OUTPUT"
       - name: Approve plan PR (deterministic gates green)

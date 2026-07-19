@@ -285,7 +285,14 @@ def main():
     pr_number, base_sha, head_sha = sys.argv[1], sys.argv[2], sys.argv[3]
     repo = os.environ["GITHUB_REPOSITORY"]
 
-    feature_id = os.environ.get("GITHUB_HEAD_REF", "").removeprefix("feature/")
+    # Identity from the PR's content, never the branch name (the branch
+    # format is a per-project setting — round 23): the feature is the single
+    # plans/<feature_id>/ directory this PR touches between base and head.
+    changed = sh("git", "diff", "--name-only", f"{base_sha}..{head_sha}", "--", "plans/")
+    ids = sorted({p.split("/")[1] for p in changed.splitlines() if p.count("/") >= 2})
+    if len(ids) != 1:
+        raise SystemExit(f"expected exactly one plans/<feature_id>/ dir changed base..head, found: {ids or 'none'}")
+    feature_id = ids[0]
     plan = open(f"plans/{feature_id}/plan.json").read()
     diff = sh("git", "diff", f"{base_sha}..{head_sha}")
     if len(diff) > MAX_DIFF_CHARS:

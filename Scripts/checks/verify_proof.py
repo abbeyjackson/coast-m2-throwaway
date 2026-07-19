@@ -144,10 +144,16 @@ def main():
         return 2
     base_sha, head_sha, branch = sys.argv[1], sys.argv[2], sys.argv[3]
 
-    if not branch.startswith("feature/"):
-        fail("check2", branch, "branch name must be feature/<feature_id>")
+    # Identity comes from the PR's CONTENT, never the branch name: the branch
+    # format is a per-project setting (branch-name delta, round 23), so the
+    # harness derives the feature from the single plans/<feature_id>/
+    # directory this PR touches between base and head.
+    changed = git("diff", "--name-only", f"{base_sha}..{head_sha}", "--", "plans/")
+    ids = sorted({p.split("/")[1] for p in changed.splitlines() if p.count("/") >= 2})
+    if len(ids) != 1:
+        fail("check2", "plans/", f"expected exactly one plans/<feature_id>/ dir changed base..head, found: {ids or 'none'}")
         return finish()
-    feature_id = branch[len("feature/"):]
+    feature_id = ids[0]
     plan_path = f"plans/{feature_id}/plan.json"
     proof_path = f"plans/{feature_id}/proof.json"
     ticket_path = f"plans/{feature_id}/ticket.json"
@@ -195,7 +201,7 @@ def main():
     # ---- Check 2 — identity binding --------------------------------------
     plan_bytes = read_head_bytes(plan_path)
     if proof["feature_id"] != plan["feature_id"] or plan["feature_id"] != feature_id:
-        fail("check2", "feature_id", f"proof/plan/branch disagree: {proof['feature_id']}/{plan['feature_id']}/{feature_id}")
+        fail("check2", "feature_id", f"proof/plan/PR disagree: {proof['feature_id']}/{plan['feature_id']}/{feature_id}")
     if proof["plan_version"] != plan["plan_version"]:
         fail("check2", "plan_version", "proof and plan disagree")
     if proof["plan_file_hash"] != sha256hex(plan_bytes):
