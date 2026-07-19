@@ -1,5 +1,6 @@
 /// A simple, stateless formatter that produces greeting strings.
 public struct Greeter {
+    /// Creates a new greeter.
     public init() {}
 
     /// Formats a greeting addressed to the given name.
