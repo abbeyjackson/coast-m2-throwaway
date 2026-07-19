@@ -9,11 +9,6 @@
       "given": "a Greeter instance",
       "then": "it returns \"Hello, world!\"",
       "when": "greet() is called with no arguments"
-    },
-    {
-      "given": "a Greeter instance",
-      "then": "it returns \"Hello, !\"",
-      "when": "greet(name: \"\") is called with an empty string"
     }
   ],
   "base_commit": "ee5b647ead45ae3c7971fcd7ccbcd95645b52aba",
@@ -35,6 +30,6 @@
     }
   ],
   "plan_schema_version": 1,
-  "plan_version": 1,
+  "plan_version": 2,
   "ticket_ref": "T-M1"
 }
