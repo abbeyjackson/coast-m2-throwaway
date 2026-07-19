@@ -1,12 +1,12 @@
-/// Placeholder stub — real greeting logic arrives via the Coast pipeline.
+/// A simple greeter that produces friendly greeting messages.
 public struct Greeter {
     public init() {}
 
     public func greet(name: String) -> String {
-        "TODO"
+        "Hello, \(name)!"
     }
 
     public func greet() -> String {
-        "TODO"
+        "Hello, world!"
     }
 }
