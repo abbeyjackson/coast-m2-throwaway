@@ -3,10 +3,10 @@ public struct Greeter {
     public init() {}
 
     public func greet(name: String) -> String {
-        "not implemented"
+        "Hello, \(name)!"
     }
 
     public func greet() -> String {
-        "not implemented"
+        "Hello, world!"
     }
 }
