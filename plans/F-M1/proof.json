@@ -1,0 +1,68 @@
+{
+  "base_commit": "866cb1cb0d2f03a7ca5335a03a5f442fff3fa89a",
+  "export_seq": 27,
+  "exported_at": "2026-07-19T04:15:57.388Z",
+  "feature_id": "F-M1",
+  "items": [
+    {
+      "content_hash": "sha256:4e4f335478f1d29b7976d6b66315f86900056cbc3371a61699336aabcbb27429",
+      "description": "Public type `Greeter` with `greet(name: String) -> String` returning \"Hello, <name>!\" and `greet() -> String` returning \"Hello, world!\".",
+      "item_id": "F-M1-i001",
+      "kind": "type",
+      "origin": "plan",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift",
+      "verdicts": [
+        {
+          "agent_identity": {
+            "model": "claude-sonnet-5",
+            "provider": "anthropic"
+          },
+          "approval_id": "bfb21f88-b4d3-4c0b-a805-45356893e9d9",
+          "approver_role": "architect",
+          "item_content_hash": "sha256:4e4f335478f1d29b7976d6b66315f86900056cbc3371a61699336aabcbb27429",
+          "plan_version": 1,
+          "rules_checked": [
+            {
+              "reasoning": "The item is declared as kind 'type' and describes a concrete Swift type (Greeter) with instance methods. This matches what is actually being built — a type, not a protocol, function, or module. Kind matches actual shape.",
+              "rule": "A-KIND"
+            },
+            {
+              "reasoning": "Target Sources/Greeter/Greeter.swift places the Greeter type inside its own Greeter module/source root, which is the natural home for the library's primary type. No cross-module misplacement.",
+              "rule": "A-MODULE"
+            },
+            {
+              "reasoning": "This is a plain library type with no view layer, view-model, or data-access context in this feature; the greet logic is simple string formatting held in the type itself, not smuggled into a view or view model. No altitude violation applies.",
+              "rule": "A-ALTITUDE"
+            },
+            {
+              "reasoning": "A single new type is warranted here since this is the first and only type in a brand-new module (F-M1 introduces Greeter itself); there is no existing type to extend. Granularity (one type, two related greet methods) is appropriately scoped and cohesive (SRP).",
+              "rule": "A-GRAIN"
+            },
+            {
+              "reasoning": "No protocol is introduced by this item — it's a concrete type only. No speculative abstraction is present, so this rule is satisfied trivially.",
+              "rule": "A-PROTO"
+            },
+            {
+              "reasoning": "Greeter (noun, capitalized type name), greet(name:) and greet() (verb-based method names, lowerCamelCase) follow Swift API Design Guidelines conventions for types and methods.",
+              "rule": "A-NAMING"
+            },
+            {
+              "reasoning": "The item is a single self-contained file with no declared imports beyond standard library needs implied by string formatting; no forbidden import or reversed dependency direction is introduced.",
+              "rule": "A-COUPLING"
+            }
+          ],
+          "supersedes": null,
+          "timestamp": "2026-07-19T04:15:48.325Z",
+          "trigger": "initial",
+          "verdict": "approved"
+        }
+      ]
+    }
+  ],
+  "plan_file_hash": "sha256:2f016efc76fe3d03ce7a2bc189b3bb43fa0ae08304fbaa4e80bbc971cadfa9d2",
+  "plan_version": 1,
+  "proof_schema_version": 1,
+  "purpose": "plan-pr",
+  "superseded_items": []
+}
