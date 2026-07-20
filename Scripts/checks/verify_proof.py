@@ -35,8 +35,11 @@ AMENDMENT_SCHEMA_VERSION = 1
 TICKET_SCHEMA_VERSION = 1
 
 # Coast-written path classes excluded from check 6 (F2 §3.2 PLANS/GENERATED).
-COAST_WRITTEN_PREFIXES = ("plans/", "docs/diagrams/", "Modules/Data/Generated/")
-COAST_WRITTEN_EXACT = ("Package.resolved",)
+# docs/api/, docs/modules/, docs/features/index.md: the docs generator's
+# output (deltas 31b) — mirrors PathClasses.v1iOSDefaults.generated.
+COAST_WRITTEN_PREFIXES = ("plans/", "docs/diagrams/", "Modules/Data/Generated/",
+                          "docs/api/", "docs/modules/")
+COAST_WRITTEN_EXACT = ("Package.resolved", "docs/features/index.md")
 
 failures = []
 
@@ -115,9 +118,18 @@ def git(*args, check=True):
     return result.stdout
 
 
+_git_show_cache = {}
+
+
 def git_show_bytes(sha, path):
-    result = subprocess.run(["git", "show", f"{sha}:{path}"], capture_output=True)
-    return result.stdout if result.returncode == 0 else None
+    # Memoized: a Words batch puts N changes to ONE catalog in one ticket,
+    # and dc4 reads each change's catalog from both trees — without the
+    # cache that is 2N identical subprocess calls per merge gate.
+    key = (sha, path)
+    if key not in _git_show_cache:
+        result = subprocess.run(["git", "show", f"{sha}:{path}"], capture_output=True)
+        _git_show_cache[key] = result.stdout if result.returncode == 0 else None
+    return _git_show_cache[key]
 
 
 def read_head_bytes(path):
@@ -126,6 +138,248 @@ def read_head_bytes(path):
             return fh.read()
     except OSError:
         return None
+
+
+STRING_CATALOG_SUFFIXES = (".strings", ".xcstrings")
+
+STRINGS_VALUE_RE = r'"({key})"\s*=\s*"((?:[^"\\]|\\.)*)"\s*;'
+
+
+def strings_unescape(value):
+    """Mirror of Coast's DirectChangeApplier.unescaped (single pass)."""
+    out, i = [], 0
+    while i < len(value):
+        ch = value[i]
+        if ch == "\\" and i + 1 < len(value):
+            nxt = value[i + 1]
+            mapped = {"n": "\n", "t": "\t", '"': '"', "\\": "\\"}.get(nxt)
+            if mapped is not None:
+                out.append(mapped)
+                i += 2
+                continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def catalog_value(raw, path, key, locale, plural_variation=None):
+    """The current text for `key` in a catalog blob, or (None, reason).
+    `plural_variation` reads that CLDR category's value instead of the plain
+    stringUnit (Words C1 plural changes); .strings files have no plurals."""
+    if raw is None:
+        return None, "file missing"
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return None, "not UTF-8"
+    if path.endswith(".xcstrings"):
+        try:
+            doc = json.loads(text)
+        except ValueError:
+            return None, "not valid JSON"
+        loc = locale or doc.get("sourceLanguage")
+        localization = (doc.get("strings", {}).get(key, {})
+                        .get("localizations", {}).get(loc or "", {}))
+        if plural_variation:
+            unit = (localization.get("variations", {}).get("plural", {})
+                    .get(plural_variation, {}).get("stringUnit", {}))
+            value = unit.get("value")
+            return ((value, None) if value is not None
+                    else (None, f"key has no {loc} {plural_variation} plural variation"))
+        unit = localization.get("stringUnit", {})
+        value = unit.get("value")
+        return (value, None) if value is not None else (None, f"key has no {loc} value")
+    if plural_variation:
+        return None, "plural forms don't live in .strings files"
+    matches = re.findall(STRINGS_VALUE_RE.format(key=re.escape(key)), text)
+    if len(matches) != 1:
+        return None, f"key appears {len(matches)} times"
+    return strings_unescape(matches[0][1]), None
+
+
+def planless_common_checks(check, proof, proof_raw, proof_path, plan_path,
+                           ticket_path, required_fields, no_plan_reason):
+    """Shared check-1 body for every PLANLESS proof purpose (direct-change,
+    bug-fix): canonical form, schema version, required fields, NO plan file,
+    and the ticket file's own existence/schema/canonical checks. One copy —
+    a schema bump or canonical-rule change lands on both paths at once.
+    Returns the parsed ticket, or None when a hard failure stops the check.
+    """
+    if canonical(proof) != proof_raw:
+        fail(check, proof_path, "not in canonical form (§6.0 byte-exact rule)")
+    if proof.get("proof_schema_version") != PROOF_SCHEMA_VERSION:
+        fail(check, proof_path, f"proof_schema_version != {PROOF_SCHEMA_VERSION}")
+    for key in required_fields:
+        if key not in proof:
+            fail(check, proof_path, f"missing required field {key}")
+    if read_head_bytes(plan_path) is not None:
+        fail(check, plan_path, no_plan_reason)
+    ticket_raw = read_head_bytes(ticket_path)
+    if ticket_raw is None:
+        fail(check, ticket_path, "missing at PR head")
+        return None
+    try:
+        ticket = json.loads(ticket_raw.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError) as err:
+        fail(check, ticket_path, f"does not parse: {err}")
+        return None
+    if ticket.get("ticket_schema_version") != TICKET_SCHEMA_VERSION:
+        fail(check, ticket_path, f"ticket_schema_version != {TICKET_SCHEMA_VERSION}")
+    if canonical(ticket) != ticket_raw:
+        fail(check, ticket_path, "not in canonical form")
+    return ticket
+
+
+def planless_identity_check(check, proof, ticket, ticket_path, feature_id):
+    """Shared check-2 body for planless proofs: proof/ticket/PR agree."""
+    if proof["feature_id"] != feature_id or ticket.get("feature_id") != feature_id:
+        fail(check, "feature_id", f"proof/ticket/PR disagree: {proof['feature_id']}/{ticket.get('feature_id')}/{feature_id}")
+    if not ticket.get("ticket_ref"):
+        fail(check, ticket_path, "ticket_ref missing")
+    if not failures:
+        ok(check)
+
+
+def verify_direct_change(base_sha, head_sha, feature_id, proof, proof_raw,
+                         proof_path, ticket_path, plan_path):
+    """The planless direct-change PR (coast-ticket-types-spec.md §3, D116).
+    The proof IS the ticketed edit; these checks make the trees agree with it:
+      dc1 existence + schema (and NO plan file — a direct change has none)
+      dc2 identity binding
+      dc3 diff scope — only the declared catalogs (+ the proof/ticket) changed
+      dc4 content match — base tree said the expected text, head says the new
+    """
+    # ---- dc1 — existence + schema + canonical form -----------------------
+    ticket = planless_common_checks(
+        "dc1", proof, proof_raw, proof_path, plan_path, ticket_path,
+        ["feature_id", "purpose", "export_seq", "changes", "allowed_files"],
+        "a direct-change PR must not carry a plan file")
+    changes = proof.get("changes", [])
+    if not isinstance(changes, list) or not changes:
+        fail("dc1", proof_path, "changes must be a non-empty list")
+        return
+    plural_categories = {"zero", "one", "two", "few", "many", "other"}
+    for change in changes:
+        for key in ["catalog", "key", "expected_current", "new_value"]:
+            if key not in change:
+                fail("dc1", proof_path, f"a change is missing required field {key}")
+        variation = change.get("plural_variation")
+        if variation is not None and variation not in plural_categories:
+            fail("dc1", proof_path, f"'{variation}' is not a plural category")
+        if change.get("expected_current") is None and variation is None:
+            fail("dc1", proof_path,
+                 "expected_current is null on a plain change — only a plural variation being added may omit it")
+    if ticket is None or failures:
+        return
+    ok("dc1")
+
+    # ---- dc2 — identity binding ------------------------------------------
+    planless_identity_check("dc2", proof, ticket, ticket_path, feature_id)
+
+    # ---- dc3 — diff scope: recomputed allowed files, nothing else --------
+    recomputed = sorted({c["catalog"] for c in changes})
+    if sorted(proof["allowed_files"]) != recomputed:
+        fail("dc3", proof_path, "allowed_files does not recompute from the changes list")
+    for catalog in recomputed:
+        if not catalog.endswith(STRING_CATALOG_SUFFIXES):
+            fail("dc3", catalog, "not a string catalog (.strings or .xcstrings)")
+        if catalog.startswith("/") or ".." in catalog.split("/"):
+            fail("dc3", catalog, "not a repo-relative path")
+    permitted = set(recomputed) | {proof_path, ticket_path}
+    for line in git("diff", "--name-status", f"{base_sha}..{head_sha}").splitlines():
+        parts = line.split("\t")
+        status, paths = parts[0], parts[1:]
+        for path in paths:
+            if path not in permitted:
+                fail("dc3", path, "changed outside the declared catalogs (diff-scope guard)")
+        if status.startswith(("D", "R")) and any(p in set(recomputed) for p in paths):
+            fail("dc3", paths[0], "a declared catalog may only be edited, never deleted or renamed")
+    if not failures:
+        ok("dc3", f"{len(recomputed)} catalog(s)")
+
+    # ---- dc4 — content match against BOTH trees --------------------------
+    for change in changes:
+        catalog, key = change["catalog"], change["key"]
+        locale = change.get("locale")
+        variation = change.get("plural_variation")
+        base_value, base_err = catalog_value(git_show_bytes(base_sha, catalog), catalog, key,
+                                             locale, variation)
+        if change["expected_current"] is None:
+            # A plural variation being ADDED: the base tree must not have it.
+            if base_value is not None:
+                fail("dc4", f"{catalog}:{key}",
+                     f"the {variation} plural variation already exists in the base tree — the ticket declared it new")
+        elif base_value != change["expected_current"]:
+            fail("dc4", f"{catalog}:{key}",
+                 f"base tree does not say the expected current text ({base_err or 'value differs'})")
+        head_value, head_err = catalog_value(git_show_bytes(head_sha, catalog), catalog, key,
+                                             locale, variation)
+        if head_value != change["new_value"]:
+            fail("dc4", f"{catalog}:{key}",
+                 f"head tree does not say the declared new text ({head_err or 'value differs'})")
+    if not failures:
+        ok("dc4", f"{len(changes)} change(s) match both trees")
+
+
+def verify_bug_fix(base_sha, head_sha, feature_id, proof, proof_raw,
+                   proof_path, ticket_path, plan_path):
+    """The planless CONTAINED bug-fix PR (ledger-and-proof spec §6.5,
+    purpose bug-fix). No plan and no approvals exist — the proof carries the
+    investigation record, the repro-test identifier, and the declared fix
+    scope. Unlike a direct change there is no deterministic content check
+    (the suite + AI review judge the fix); these checks bound its blast
+    radius mechanically:
+      bf1 existence + schema (and NO plan file — a contained fix has none)
+      bf2 identity binding
+      bf3 diff scope — changed paths ⊆ fix scope ∪ test ADDITIONS ∪ the
+          proof/ticket files (a modified existing test file fails: tests are
+          locked, D92)
+    """
+    # ---- bf1 — existence + schema + canonical form -----------------------
+    ticket = planless_common_checks(
+        "bf1", proof, proof_raw, proof_path, plan_path, ticket_path,
+        ["feature_id", "purpose", "export_seq", "investigation",
+         "repro_test", "fix_scope", "tests_directory"],
+        "a contained bug-fix PR must not carry a plan file (over-threshold fixes go through the feature pipeline)")
+    fix_scope = proof.get("fix_scope", [])
+    if not isinstance(fix_scope, list) or not fix_scope:
+        fail("bf1", proof_path, "fix_scope must be a non-empty list (an undeclarable scope fails the plan gate closed — it never ships planless)")
+        return
+    tests_dir = proof.get("tests_directory", "")
+    if not isinstance(tests_dir, str) or not tests_dir or tests_dir.startswith("/") or ".." in tests_dir.split("/"):
+        fail("bf1", proof_path, "tests_directory must be a repo-relative directory path")
+        return
+    if not proof.get("repro_test"):
+        fail("bf1", proof_path, "repro_test identifier is empty")
+    if ticket is None or failures:
+        return
+    ok("bf1")
+
+    # ---- bf2 — identity binding ------------------------------------------
+    planless_identity_check("bf2", proof, ticket, ticket_path, feature_id)
+
+    # ---- bf3 — diff scope: fix scope ∪ test additions ∪ proof/ticket -----
+    # Exactly the proof and ticket files are permitted from the plans dir,
+    # matching dc3 — a PR smuggling any other file under plans/<feature_id>/
+    # fails, the same blast-radius posture as the direct-change path.
+    scope = set(fix_scope)
+    for path in scope:
+        if path.startswith("/") or ".." in path.split("/"):
+            fail("bf3", path, "fix_scope entries must be repo-relative paths")
+    tests_prefix = tests_dir if tests_dir.endswith("/") else tests_dir + "/"
+    for line in git("diff", "--name-status", f"{base_sha}..{head_sha}").splitlines():
+        parts = line.split("\t")
+        status, paths = parts[0], parts[1:]
+        for path in paths:
+            if path in scope or path in (proof_path, ticket_path):
+                continue
+            if path.startswith(tests_prefix):
+                if not status.startswith("A"):
+                    fail("bf3", path, "test files may only be ADDED in a bug fix — existing tests are locked (D92)")
+                continue
+            fail("bf3", path, "changed outside the declared fix scope (diff-scope guard)")
+    if not failures:
+        ok("bf3", f"{len(scope)} file(s) in scope")
 
 
 def is_currently_approved(entry):
@@ -144,6 +398,21 @@ def main():
         return 2
     base_sha, head_sha, branch = sys.argv[1], sys.argv[2], sys.argv[3]
 
+    # ---- Governance-only PRs (Coast/the founder ship their own gate
+    # updates). The shipped checks and workflows are GOVERNING class: agents
+    # cannot write them (the tool wall), so a diff touching NOTHING but
+    # governance paths is app/founder maintenance — there is no agent work
+    # to prove. Deterministic pass, the same posture as a plans-only diff.
+    # A MIXED diff (governance + anything else) takes the full proof path
+    # and fails check 6 for the governance files, so agent work can never
+    # smuggle a script change alongside itself.
+    governance_prefixes = ("Scripts/checks/", ".github/")
+    all_changed = [p for p in
+                   git("diff", "--name-only", f"{base_sha}..{head_sha}").splitlines() if p]
+    if all_changed and all(p.startswith(governance_prefixes) for p in all_changed):
+        ok("governance-only", f"{len(all_changed)} governance file(s); no agent work to prove")
+        return finish()
+
     # Identity comes from the PR's CONTENT, never the branch name: the branch
     # format is a per-project setting (branch-name delta, round 23), so the
     # harness derives the feature from the single plans/<feature_id>/
@@ -157,6 +426,26 @@ def main():
     plan_path = f"plans/{feature_id}/plan.json"
     proof_path = f"plans/{feature_id}/proof.json"
     ticket_path = f"plans/{feature_id}/ticket.json"
+
+    # ---- Planless direct-change PRs branch on the proof's purpose --------
+    # (coast-ticket-types-spec.md §3, D116: no plan, no approvals — the
+    # proof carries the ticketed edit and the trees must agree with it.)
+    peek_raw = read_head_bytes(proof_path)
+    if peek_raw is not None:
+        try:
+            peek = json.loads(peek_raw.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            peek = None
+        if isinstance(peek, dict) and peek.get("purpose") == "direct-change":
+            verify_direct_change(base_sha, head_sha, feature_id, peek, peek_raw,
+                                 proof_path, ticket_path, plan_path)
+            return finish()
+        # A contained bug fix (§6.5, purpose bug-fix) is also planless —
+        # bounded by its declared fix scope; AI review still runs.
+        if isinstance(peek, dict) and peek.get("purpose") == "bug-fix":
+            verify_bug_fix(base_sha, head_sha, feature_id, peek, peek_raw,
+                           proof_path, ticket_path, plan_path)
+            return finish()
 
     # ---- Check 1 — existence + schema + canonical form -------------------
     docs = {}
@@ -269,6 +558,26 @@ def main():
                 fail("check3", entry["item_id"], "drift item not currently approved")
         if entry.get("sensitive") and not has_security_approval(entry):
             fail("check3", entry["item_id"], "sensitive item lacks an approved security-approval verdict")
+    # The plan-bar approval (the human's approval of the plan itself, with
+    # the cost estimate it was made against). Enforced on IMPLEMENTATION
+    # PRs only — a plan PR may legitimately precede the approval event.
+    # When the history rides the proof, its operative verdict must approve
+    # and must bind THIS plan file's hash — an approval of some earlier
+    # revision proves nothing.
+    plan_approval = proof.get("plan_approval")
+    if plan_approval is not None and purpose == "implementation-pr":
+        if not isinstance(plan_approval, list) or not plan_approval \
+                or not all(isinstance(v, dict) for v in plan_approval):
+            fail("check3", "plan", "plan_approval must be a non-empty list of verdict objects")
+        else:
+            last = plan_approval[-1]
+            if last.get("verdict") != "approved":
+                fail("check3", "plan", "plan-bar operative verdict is not approved")
+            if last.get("item_content_hash") != proof.get("plan_file_hash"):
+                fail("check3", "plan", "plan-bar approval binds a different plan file hash")
+            context = last.get("context")
+            if not isinstance(context, dict) or "estimate_low_usd_micros" not in context:
+                fail("check3", "plan", "plan-bar approval carries no cost estimate")
     if not [f for f in failures if f["check"] == "check3"]:
         ok("check3")
 
