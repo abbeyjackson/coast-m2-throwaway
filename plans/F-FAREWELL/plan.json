@@ -1,0 +1,48 @@
+{
+  "acceptance_criteria": [
+    {
+      "given": "a Greeter instance",
+      "then": "it returns exactly \"Goodbye, Abbey!\"",
+      "when": "farewell(name: \"Abbey\") is called"
+    },
+    {
+      "given": "a Greeter instance",
+      "then": "it returns exactly \"Goodbye!\"",
+      "when": "farewell() is called"
+    },
+    {
+      "given": "a Greeter instance",
+      "then": "they return exactly their current existing behavior, unchanged",
+      "when": "greet(name:) and greet() are called"
+    }
+  ],
+  "base_commit": "1f86e9105e0af3537988394cd9851096afa6f50b",
+  "db_change": false,
+  "declared_scope": [
+    "Sources/Greeter/Greeter.swift",
+    "Tests/GreeterTests/**",
+    "docs/features/F-FAREWELL/**"
+  ],
+  "feature_id": "F-FAREWELL",
+  "items": [
+    {
+      "content_hash": "sha256:6f024673f5f6000448985d3ad75ad195eaaef4a55836f9fc2be9f69536f745c3",
+      "description": "Add public method farewell(name: String) -> String to Greeter struct returning exactly \"Goodbye, <name>!\"",
+      "item_id": "F-FAREWELL-i001",
+      "kind": "type",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift"
+    },
+    {
+      "content_hash": "sha256:841853bf882d925fd8669e2f8f3e536a1146d9424e098309f069a7a9dde9d2bb",
+      "description": "Add public method farewell() -> String to Greeter struct returning exactly \"Goodbye!\"",
+      "item_id": "F-FAREWELL-i002",
+      "kind": "type",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift"
+    }
+  ],
+  "plan_schema_version": 1,
+  "plan_version": 1,
+  "ticket_ref": "FAREWELL"
+}

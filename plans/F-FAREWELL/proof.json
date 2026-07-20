@@ -1,0 +1,123 @@
+{
+  "base_commit": "1f86e9105e0af3537988394cd9851096afa6f50b",
+  "export_seq": 121,
+  "exported_at": "2026-07-20T23:58:01.130Z",
+  "feature_id": "F-FAREWELL",
+  "items": [
+    {
+      "content_hash": "sha256:6f024673f5f6000448985d3ad75ad195eaaef4a55836f9fc2be9f69536f745c3",
+      "description": "Add public method farewell(name: String) -> String to Greeter struct returning exactly \"Goodbye, <name>!\"",
+      "item_id": "F-FAREWELL-i001",
+      "kind": "type",
+      "origin": "plan",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift",
+      "verdicts": [
+        {
+          "agent_identity": {
+            "model": "claude-sonnet-5",
+            "provider": "anthropic"
+          },
+          "approval_id": "206b33f0-8bda-4e22-b32b-fdf97db8ae2c",
+          "approver_role": "architect",
+          "item_content_hash": "sha256:6f024673f5f6000448985d3ad75ad195eaaef4a55836f9fc2be9f69536f745c3",
+          "plan_version": 1,
+          "rules_checked": [
+            {
+              "reasoning": "The item declares kind 'type' for a change that adds a method to the existing Greeter struct. This mirrors the existing pattern in the same plan (i002, also kind 'type', also a method addition) and the file itself, where greet(name:) and greet() are simple member methods on the Greeter struct — the change is a member-level addition to a type definition, which the 'type' kind category covers; it is not mis-declared as e.g. a new module or a protocol.",
+              "rule": "A-KIND"
+            },
+            {
+              "reasoning": "Target Sources/Greeter/Greeter.swift is the exact file where the Greeter struct and its existing greet(name:)/greet() methods live. Adding farewell(name:) to this same file/struct is the correct home — no new module or misplaced location is introduced.",
+              "rule": "A-MODULE"
+            },
+            {
+              "reasoning": "Greeter is a stateless formatter producing strings; farewell(name:) does the same kind of pure string-formatting work as the existing greet methods. No view/view-model layering exists in this codebase and no domain logic or data access is being smuggled into an inappropriate layer.",
+              "rule": "A-ALTITUDE"
+            },
+            {
+              "reasoning": "This is a single additional method on an existing, already-stateless formatter struct that already hosts near-identical greet(name:)/greet() pairs. Extending the existing Greeter struct rather than creating a new type is the right granularity; a new type would be unwarranted for one more formatting method with identical responsibility.",
+              "rule": "A-GRAIN"
+            },
+            {
+              "reasoning": "No protocol or abstraction is introduced by this item; it only adds a concrete method to a concrete struct. No speculative abstraction exists to evaluate.",
+              "rule": "A-PROTO"
+            },
+            {
+              "reasoning": "farewell(name: String) -> String follows Swift API Design Guidelines and mirrors the existing greet(name: String) -> String signature exactly in shape and argument labeling, so the name and its parameter clearly carry method semantics consistent with the rest of the type.",
+              "rule": "A-NAMING"
+            },
+            {
+              "reasoning": "The change adds a method within the same file/module with no new imports or cross-module references; dependency direction is unaffected and nothing is smuggled in from outside the declared scope.",
+              "rule": "A-COUPLING"
+            }
+          ],
+          "supersedes": null,
+          "timestamp": "2026-07-20T23:57:24.784Z",
+          "trigger": "initial",
+          "verdict": "approved"
+        }
+      ]
+    },
+    {
+      "content_hash": "sha256:841853bf882d925fd8669e2f8f3e536a1146d9424e098309f069a7a9dde9d2bb",
+      "description": "Add public method farewell() -> String to Greeter struct returning exactly \"Goodbye!\"",
+      "item_id": "F-FAREWELL-i002",
+      "kind": "type",
+      "origin": "plan",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift",
+      "verdicts": [
+        {
+          "agent_identity": {
+            "model": "claude-sonnet-5",
+            "provider": "anthropic"
+          },
+          "approval_id": "d417293b-e215-4fc7-96d0-278929b4b336",
+          "approver_role": "architect",
+          "item_content_hash": "sha256:841853bf882d925fd8669e2f8f3e536a1146d9424e098309f069a7a9dde9d2bb",
+          "plan_version": 1,
+          "rules_checked": [
+            {
+              "reasoning": "Item adds a method (farewell()) to the existing Greeter struct; kind 'type' is used consistently with the sibling item F-FAREWELL-i001 which follows the same pattern of adding a method to Greeter.swift's type. It correctly reflects a modification to an existing type rather than mis-declaring it as, e.g., a new module or standalone function.",
+              "rule": "A-KIND"
+            },
+            {
+              "reasoning": "Target Sources/Greeter/Greeter.swift is the existing home of the Greeter struct, which already contains the sibling greet()/greet(name:) methods. Adding farewell() here keeps related formatting behavior colocated in its correct module.",
+              "rule": "A-MODULE"
+            },
+            {
+              "reasoning": "Greeter.swift is a plain stateless formatter type with no view or data-access layering in this codebase; farewell() is a pure string-formatting method with no domain logic misplaced in a view or view-model, matching the altitude of the existing greet() methods.",
+              "rule": "A-ALTITUDE"
+            },
+            {
+              "reasoning": "This extends the existing Greeter struct with a second no-arg formatting method (mirroring greet()/greet(name:) pattern) rather than introducing a new type; granularity matches the existing sibling method greet() which has the identical no-arg/with-arg split, so no new type is warranted.",
+              "rule": "A-GRAIN"
+            },
+            {
+              "reasoning": "No protocol or abstraction is introduced by this item; it is a concrete method addition with no substitution or test-seam need indicated.",
+              "rule": "A-PROTO"
+            },
+            {
+              "reasoning": "farewell() -> String follows Swift API Design Guidelines: a noun-based method name returning a value, directly mirroring the existing greet() -> String method's naming and signature style.",
+              "rule": "A-NAMING"
+            },
+            {
+              "reasoning": "No imports are added or changed; the method operates entirely within the existing Greeter struct in its own module, respecting dependency direction.",
+              "rule": "A-COUPLING"
+            }
+          ],
+          "supersedes": null,
+          "timestamp": "2026-07-20T23:57:49.650Z",
+          "trigger": "initial",
+          "verdict": "approved"
+        }
+      ]
+    }
+  ],
+  "plan_file_hash": "sha256:b0b8ae80be0a66782db96b4fdbf941ce1cd1455f7ce627c09632e1e3dde5f3ed",
+  "plan_version": 1,
+  "proof_schema_version": 1,
+  "purpose": "plan-pr",
+  "superseded_items": []
+}

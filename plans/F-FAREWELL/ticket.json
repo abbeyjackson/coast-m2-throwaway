@@ -1,0 +1,6 @@
+{
+  "description": "Build: The Greeter module gains farewell support: a public method farewell(name: String) -> String on the existing Greeter struct returning exactly \"Goodbye, <name>!\", and a public method farewell() -> String returning exactly \"Goodbye!\".\nTouches: Greeter · nothing else.\nRules:\n1 · farewell(name: \"Abbey\") returns exactly \"Goodbye, Abbey!\".\n2 · farewell() returns exactly \"Goodbye!\".\n3 · The existing greet(name:) and greet() methods keep their exact current behavior.\nDesign: no screens change — behavior only.",
+  "feature_id": "F-FAREWELL",
+  "ticket_ref": "FAREWELL",
+  "ticket_schema_version": 1
+}
