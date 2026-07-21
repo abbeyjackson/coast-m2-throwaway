@@ -17,4 +17,19 @@ public struct Greeter {
     public func greet() -> String {
         "Hello, world!"
     }
+
+    /// Formats a farewell addressed to the given name.
+    ///
+    /// - Parameter name: The name to include in the farewell.
+    /// - Returns: A farewell string in the form "Goodbye, <name>!".
+    public func farewell(name: String) -> String {
+        "Goodbye, \(name)!"
+    }
+
+    /// Formats a generic farewell.
+    ///
+    /// - Returns: The farewell string "Goodbye!".
+    public func farewell() -> String {
+        "Goodbye!"
+    }
 }

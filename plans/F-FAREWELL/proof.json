@@ -1,7 +1,7 @@
 {
   "base_commit": "1f86e9105e0af3537988394cd9851096afa6f50b",
-  "export_seq": 121,
-  "exported_at": "2026-07-20T23:58:01.130Z",
+  "export_seq": 260,
+  "exported_at": "2026-07-21T00:11:44.285Z",
   "feature_id": "F-FAREWELL",
   "items": [
     {
@@ -118,6 +118,6 @@
   "plan_file_hash": "sha256:b0b8ae80be0a66782db96b4fdbf941ce1cd1455f7ce627c09632e1e3dde5f3ed",
   "plan_version": 1,
   "proof_schema_version": 1,
-  "purpose": "plan-pr",
+  "purpose": "implementation-pr",
   "superseded_items": []
 }
