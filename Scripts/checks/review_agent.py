@@ -293,7 +293,37 @@ def main():
     if len(ids) != 1:
         raise SystemExit(f"expected exactly one plans/<feature_id>/ dir changed base..head, found: {ids or 'none'}")
     feature_id = ids[0]
-    plan = open(f"plans/{feature_id}/plan.json").read()
+
+    # Direct-change PRs (coast-ticket-types-spec.md §3, D116): nothing
+    # judgeable — the change IS the specification, and verify_proof.py's
+    # dc-checks are the gate (diff scope + content match on both trees).
+    # The required approving review is submitted deterministically; no
+    # model is called and nothing is billed.
+    try:
+        proof = json.load(open(f"plans/{feature_id}/proof.json"))
+    except (OSError, ValueError):
+        proof = {}
+    if proof.get("purpose") == "direct-change":
+        post_review(repo, pr_number, "APPROVE",
+                    {"summary": "Direct change: the exact ticketed edit, applied deterministically. "
+                                "The proof verifier confirmed the diff touches only the declared "
+                                "catalogs and both trees match the declaration — nothing for an AI "
+                                "reviewer to judge, so no model was called.",
+                     "findings": []},
+                    "Direct-change review", "deterministic — no model call")
+        # No COAST-REVIEW-USAGE line: nothing was metered, nothing to ingest.
+        return
+    # A contained bug fix (purpose bug-fix, §6.5) has no plan — its context
+    # is the investigation record + repro test from the proof; the review
+    # judges the fix against those the way a feature review judges the plan.
+    if proof.get("purpose") == "bug-fix":
+        plan_label = "The bug's investigation record and repro test (no plan exists — a contained fix)"
+        plan = json.dumps({"investigation": proof.get("investigation"),
+                           "repro_test": proof.get("repro_test"),
+                           "fix_scope": proof.get("fix_scope")}, indent=2, ensure_ascii=False)
+    else:
+        plan_label = "The approved plan (already merged via its own reviewed PR)"
+        plan = open(f"plans/{feature_id}/plan.json").read()
     diff = sh("git", "diff", f"{base_sha}..{head_sha}")
     if len(diff) > MAX_DIFF_CHARS:
         diff = diff[:MAX_DIFF_CHARS] + "\n… [diff truncated]"
@@ -310,7 +340,7 @@ def main():
     # after the cache breakpoint.
     shared_context = {
         "type": "text",
-        "text": (f"The approved plan (already merged via its own reviewed PR):\n{plan}\n\n"
+        "text": (f"{plan_label}:\n{plan}\n\n"
                  f"The implementation diff to review:\n{diff}"),
         "cache_control": {"type": "ephemeral"},
     }
@@ -341,12 +371,31 @@ def main():
                                  if test_sections else
                                  "\n\nNo test files changed in this diff.")
 
+    # The generated API reference for each module the diff touches (deltas
+    # 31b): the general pass reads it so a doc that reads wrong against the
+    # code surfaces as a finding. The pages are Coast-generated world-state
+    # in the checkout (docs/api/<Module>-reference.md), capped like tests.
+    docs_sections = []
+    touched_modules = sorted({p.split("/")[1] for p in diff_paths
+                              if p.startswith("Sources/") and p.count("/") >= 2})
+    for module in touched_modules:
+        page = f"docs/api/{module}-reference.md"
+        if not os.path.exists(page):
+            continue
+        docs_sections.append(f"--- {page} (generated API reference) ---\n"
+                             + read_capped(page, MAX_TEST_FILE_CHARS))
+    general_prompt = base_prompt + (
+        "\n\nThe generated API reference for the modules this diff touches "
+        "(these pages are regenerated from the code — flag any that read "
+        "wrong or misleading against the diff):\n" + "\n".join(docs_sections)
+        if docs_sections else "")
+
     # Collect every verdict BEFORE posting anything (atomic like M1): a
     # failed run posts no reviews, so it can never leave a standing APPROVE
     # for work the specialists never judged, and Coast's crash classifier
     # (failed job + no CHANGES_REQUESTED = infra) stays sound.
     passes = [
-        ("Coast review agent", GENERAL_SYSTEM, base_prompt, diff_paths,
+        ("Coast review agent", GENERAL_SYSTEM, general_prompt, diff_paths,
          ("approve", "request_changes")),
         ("Coast Test-review specialist", TEST_REVIEW_SYSTEM, test_prompt, diff_paths,
          ("approve", "request_changes", "comment")),
