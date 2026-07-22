@@ -25,8 +25,10 @@ jobs:
             "${{ github.head_ref }}"
 
   swift-tests:
-    runs-on: ubuntu-latest
-    container: swift:6.0
+    # macOS runner so the suite can build Apple-only UI frameworks (SwiftUI):
+    # a Linux container has no SwiftUI, so any UI target fails to compile there.
+    # Swift 6 ships with the runner's Xcode, so no container is needed.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
