@@ -23,6 +23,14 @@ jobs:
             "${{ github.event.pull_request.base.sha }}" \
             "${{ github.event.pull_request.head.sha }}" \
             "${{ github.head_ref }}"
+      # D128: native platform patterns are mandatory — an added native escape
+      # hatch (curated per-platform signature list) fails the PR unless the
+      # plan's approved native-deviations list covers it.
+      - name: Check native patterns deterministically
+        run: |
+          python3 Scripts/checks/check_native_patterns.py \
+            "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.pull_request.head.sha }}"
 
   swift-tests:
     # macOS runner so the suite can build Apple-only UI frameworks (SwiftUI):
