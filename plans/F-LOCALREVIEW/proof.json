@@ -1,0 +1,68 @@
+{
+  "base_commit": "39fc19da0f295af07a7a0eecbffdd792329c2ccd",
+  "export_seq": 353,
+  "exported_at": "2026-08-16T01:53:16.563Z",
+  "feature_id": "F-LOCALREVIEW",
+  "items": [
+    {
+      "content_hash": "sha256:1f82a4318f9ba227ffc178035635e69f8c25690ce23cb0fb8fbb0084d004576b",
+      "description": "Public Greeter service with greet(name:) and greet(), revised per rejection causes",
+      "item_id": "F-LOCALREVIEW-i001",
+      "kind": "type",
+      "origin": "plan",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift",
+      "verdicts": [
+        {
+          "agent_identity": {
+            "model": "mock",
+            "provider": "anthropic"
+          },
+          "approval_id": "08dfb65d-0ec0-417a-a58f-351469701fb7",
+          "approver_role": "architect",
+          "item_content_hash": "sha256:1f82a4318f9ba227ffc178035635e69f8c25690ce23cb0fb8fbb0084d004576b",
+          "plan_version": 1,
+          "rules_checked": [
+            {
+              "reasoning": "checked, holds for this item (mock reasoning for A-ALTITUDE)",
+              "rule": "A-ALTITUDE"
+            },
+            {
+              "reasoning": "checked, holds for this item (mock reasoning for A-COUPLING)",
+              "rule": "A-COUPLING"
+            },
+            {
+              "reasoning": "checked, holds for this item (mock reasoning for A-GRAIN)",
+              "rule": "A-GRAIN"
+            },
+            {
+              "reasoning": "checked, holds for this item (mock reasoning for A-KIND)",
+              "rule": "A-KIND"
+            },
+            {
+              "reasoning": "checked, holds for this item (mock reasoning for A-MODULE)",
+              "rule": "A-MODULE"
+            },
+            {
+              "reasoning": "checked, holds for this item (mock reasoning for A-NAMING)",
+              "rule": "A-NAMING"
+            },
+            {
+              "reasoning": "checked, holds for this item (mock reasoning for A-PROTO)",
+              "rule": "A-PROTO"
+            }
+          ],
+          "supersedes": null,
+          "timestamp": "2026-08-16T01:53:06.767Z",
+          "trigger": "initial",
+          "verdict": "approved"
+        }
+      ]
+    }
+  ],
+  "plan_file_hash": "sha256:efcb959cfd69fdf99bc712dd3477aaae51f9563d12aaf833a09ef6b74838e971",
+  "plan_version": 1,
+  "proof_schema_version": 1,
+  "purpose": "plan-pr",
+  "superseded_items": []
+}
