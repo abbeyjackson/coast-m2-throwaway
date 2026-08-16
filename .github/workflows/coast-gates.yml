@@ -140,9 +140,22 @@ jobs:
       - name: Review agent (implementation PR / bug fix)
         # bug-fix (ticket-types spec §4.1 S14): code changed, so AI review
         # runs — unlike a direct change, which approves deterministically.
+        # The reviews run on the ticket's frozen brains pick (M5 H38):
+        # Anthropic, OpenAI, or Gemini — the script reads the pick from the
+        # ticket file and uses exactly the one key it needs. A project
+        # building on a local model (D149) has no key secret: its reviews
+        # run on the founder's Mac and post through the reviewer App, and
+        # this step VERIFIES that review exists for the exact head (M5
+        # H40) — deterministic, free, still blocking until it does.
         if: steps.purpose.outputs.purpose == 'implementation-pr' || steps.purpose.outputs.purpose == 'bug-fix'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # M5 H40: with no key secret at all, the script VERIFIES that the
+          # founder's Mac posted the reviewer App's review for this exact
+          # head instead of reviewing here — the slug pins the identity.
+          REVIEWER_APP_SLUG: ${{ steps.reviewer-token.outputs.app-slug }}
           GH_TOKEN: ${{ steps.reviewer-token.outputs.token }}
         run: |
           python3 Scripts/checks/review_agent.py "${{ github.event.pull_request.number }}" \
