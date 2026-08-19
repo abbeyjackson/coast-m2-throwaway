@@ -70,3 +70,44 @@ Formats a generic farewell.
 
 Namespace marker for the Greeter module (scaffold seed — the first
 feature's types arrive through the Coast pipeline).
+
+## Theme
+
+`public enum Theme`
+
+Theme tokens — seeded from the supplied designs (D101).
+The single theme file (D35): every formatting value lives here and
+only the Theming agent modifies it. Values carry the design's own
+token names.
+
+### `Colors`
+
+```swift
+public enum Colors
+```
+
+The design's colours.
+
+### `Spacing`
+
+```swift
+public enum Spacing
+```
+
+The design's spacing values.
+
+### `Radii`
+
+```swift
+public enum Radii
+```
+
+The design's corner radii.
+
+### `Typography`
+
+```swift
+public enum Typography
+```
+
+The design's text styles.

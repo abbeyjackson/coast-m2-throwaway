@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; font-family: 'Inter', -apple-system, system-ui, sans-serif; background: #f2f2f7; }
+  .page { padding: 24px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box; min-height: 100vh; }
+  .card { background: #ffffff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
+  .row { display: flex; align-items: center; gap: 14px; }
+  .avatar { width: 60px; height: 60px; border-radius: 30px; background: linear-gradient(135deg, #0a84ff, #5e5ce6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px; font-weight: 600; }
+  .name { font-size: 18px; font-weight: 600; color: #1c1c1e; }
+  .role { font-size: 14px; font-weight: 400; color: #8e8e93; }
+  .stats { display: flex; gap: 24px; padding: 4px 2px; }
+  .value { font-size: 17px; font-weight: 700; color: #1c1c1e; }
+  .label { font-size: 12px; font-weight: 500; color: #8e8e93; }
+  .follow { border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 600; background: #0a84ff; color: #ffffff; }
+  .about-label { font-size: 12px; font-weight: 500; color: #8e8e93; }
+  .about { font-size: 14px; font-weight: 400; color: #1c1c1e; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+    <div class="row">
+      <div class="avatar">KT</div>
+      <div><div class="name">Kenji Tanaka</div><div class="role">Platform Engineer</div></div>
+    </div>
+    <div class="stats">
+      <div><div class="value">41</div><div class="label">Posts</div></div>
+      <div><div class="value">960</div><div class="label">Followers</div></div>
+    </div>
+    <button class="follow">Follow</button>
+  </div>
+  <div>
+    <div class="about-label">About</div>
+    <div class="about">Kenji Tanaka has published 41 notes.</div>
+  </div>
+</div>
+</body>
+</html>

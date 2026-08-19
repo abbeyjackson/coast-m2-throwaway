@@ -1,0 +1,26 @@
+{
+  "stories" : [
+    {
+      "id" : "seq-3194f4feacec",
+      "lineage" : [
+
+      ],
+      "name" : "Follow everyone",
+      "path" : [
+        "call:Directory.TeamDirectory.followEveryone>Directory.TeamDirectory.toggleFollow",
+        "ret:Directory.TeamDirectory.toggleFollow>Directory.TeamDirectory.followEveryone",
+        "ret:Directory.TeamDirectory.followEveryone>Screens.HomeView.The home follow everyone button"
+      ]
+    },
+    {
+      "id" : "seq-91b16f3af9a4",
+      "lineage" : [
+
+      ],
+      "name" : "Sign off line",
+      "path" : [
+        "ret:Directory.TeamDirectory.signOffLine>Screens.SettingsView.The settings sign out button"
+      ]
+    }
+  ]
+}
