@@ -1,6 +1,6 @@
 {
   "bundle_schema_version": 1,
-  "bundle_version": 4,
+  "bundle_version": 3,
   "health": {
     "grade": "excellent",
     "warnings": []
@@ -44,7 +44,7 @@
     }
   ],
   "source": {
-    "imported_at": "2026-08-19T03:27:36.667Z",
+    "imported_at": "2026-08-19T03:21:24.254Z",
     "kind": "claude-design",
     "name": "source",
     "url": null
@@ -95,11 +95,6 @@
         "name": "Button text on accent",
         "provenance": "captured",
         "value": "#FFFFFF"
-      },
-      {
-        "name": "Empty state text",
-        "provenance": "captured",
-        "value": "#AEAEB2"
       }
     ],
     "radii": [

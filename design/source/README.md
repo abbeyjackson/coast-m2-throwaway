@@ -1,12 +1,15 @@
-# Handoff: Profile Card UI Element
+# Handoff: Team Directory
 
 ## Overview
-A compact, self-contained profile card intended as a small test element for a native
-Swift build system. It shows a user's identity (avatar, name, role), two summary stats
-(posts, followers), and a Follow button that toggles between "Follow" and "Following".
+A small team directory for a native Swift build system. Home greets the reader and
+lists everyone as profile cards; a member's own screen shows their card and a short
+note; Settings picks which grouping Home opens on and signs the reader out. The
+profile card is the shared element every screen is built from: identity (avatar,
+name, role), two summary stats (posts, followers), and a Follow button that toggles
+between "Follow" and "Following".
 
 ## About the Design Files
-The file in this bundle (`ProfileCard.dc.html`) is a **design reference created in HTML** —
+Each file in this bundle is a **design reference created in HTML** —
 a prototype showing the intended look and behavior, **not production code to copy directly**.
 The task is to **recreate this design in the target codebase's environment**. The stated
 target is **native Swift (SwiftUI)**; every element maps cleanly to SwiftUI primitives
@@ -18,6 +21,26 @@ components where they exist.
 interaction are all specified below. Recreate pixel-for-pixel using native SwiftUI.
 
 ## Screens / Views
+
+### Home
+- **Name**: Home
+- **Purpose**: Greet the reader and show everyone in the directory.
+- **Layout**: A vertical stack on the light-gray backdrop, **24px** page padding and
+  **18px** between rows: the greeting, the one-line explanation, "Follow everyone",
+  then one profile card per member.
+
+### Member profile
+- **Name**: Member profile
+- **Purpose**: One person's own screen.
+- **Layout**: Their profile card, then an "About" label over a single sentence,
+  **24px** page padding, **24px** between the two blocks.
+
+### Settings
+- **Name**: Settings
+- **Purpose**: Choose which grouping Home opens on, and sign out.
+- **Layout**: Title, the "Home opens on" label, the three groupings as full-width
+  buttons (the picked one uses the accent fill, the others the neutral fill), then
+  "Sign out" and the farewell line.
 
 ### Profile Card
 - **Name**: ProfileCard
@@ -65,6 +88,8 @@ Colors:
 - Avatar gradient: `#0A84FF` → `#5E5CE6` (135°)
 - Neutral / "Following" button: `#E5E5EA`
 - Button text on accent: `#FFFFFF`
+- Empty state text: `#AEAEB2` (the "No one by that name" line — the search screen
+  that shows it is still in the queue, so nothing uses this colour yet)
 
 Spacing: 2, 3, 4, 14, 18, 24 (px)
 
@@ -85,4 +110,5 @@ None. The avatar is a gradient-filled circle with text initials — no image fil
 prototype loads the Inter web font; natively, use the system font (SF Pro).
 
 ## Files
-- `ProfileCard.dc.html` — the HTML design reference (open in a browser to view/interact).
+- `Home.html`, `Member profile.html`, `Settings.html`, `Profile card.html` — the HTML
+  design references (open in a browser to view/interact).
