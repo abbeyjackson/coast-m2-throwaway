@@ -1,0 +1,200 @@
+{
+  "bundle_schema_version": 1,
+  "bundle_version": 3,
+  "health": {
+    "grade": "excellent",
+    "warnings": []
+  },
+  "screens": [
+    {
+      "content_hash": "sha256:9e5ab2d404182e03c767d67e6ee69ecbe1a224253a3ea747adc0d9b5d1ee5664",
+      "context": "design/screens/home/context.json",
+      "id": "home",
+      "name": "Home",
+      "platform_hint": "unknown",
+      "reference": "design/screens/home/reference.png",
+      "source_ref": "Home.html"
+    },
+    {
+      "content_hash": "sha256:74b64dd2ec6117a87797dbaf5061d8a47b07d449fbb227a4244e2e34b460bfb4",
+      "context": "design/screens/member-profile/context.json",
+      "id": "member-profile",
+      "name": "Member profile",
+      "platform_hint": "unknown",
+      "reference": "design/screens/member-profile/reference.png",
+      "source_ref": "Member profile.html"
+    },
+    {
+      "content_hash": "sha256:09c36f1e78c12c24f7328379dea68dab123313dcdc18596093e11f63b20803c3",
+      "context": "design/screens/profile-card/context.json",
+      "id": "profile-card",
+      "name": "Profile card",
+      "platform_hint": "unknown",
+      "reference": "design/screens/profile-card/reference.png",
+      "source_ref": "Profile card.html"
+    },
+    {
+      "content_hash": "sha256:fe8e28bac04add6fae5161326151e109694021900491e39e9af38fcaa55fc678",
+      "context": "design/screens/settings/context.json",
+      "id": "settings",
+      "name": "Settings",
+      "platform_hint": "unknown",
+      "reference": "design/screens/settings/reference.png",
+      "source_ref": "Settings.html"
+    }
+  ],
+  "source": {
+    "imported_at": "2026-08-19T03:21:24.254Z",
+    "kind": "claude-design",
+    "name": "source",
+    "url": null
+  },
+  "tokens": {
+    "colors": [
+      {
+        "name": "Background",
+        "provenance": "captured",
+        "value": "#F2F2F7"
+      },
+      {
+        "name": "Card surface",
+        "provenance": "captured",
+        "value": "#FFFFFF"
+      },
+      {
+        "name": "Primary text",
+        "provenance": "captured",
+        "value": "#1C1C1E"
+      },
+      {
+        "name": "Secondary text",
+        "provenance": "captured",
+        "value": "#8E8E93"
+      },
+      {
+        "name": "Accent",
+        "provenance": "captured",
+        "value": "#0A84FF"
+      },
+      {
+        "name": "Avatar gradient",
+        "provenance": "captured",
+        "value": "#0A84FF"
+      },
+      {
+        "name": "Avatar gradient end",
+        "provenance": "captured",
+        "value": "#5E5CE6"
+      },
+      {
+        "name": "Neutral",
+        "provenance": "captured",
+        "value": "#E5E5EA"
+      },
+      {
+        "name": "Button text on accent",
+        "provenance": "captured",
+        "value": "#FFFFFF"
+      }
+    ],
+    "radii": [
+      {
+        "name": "card",
+        "provenance": "captured",
+        "value": "20"
+      },
+      {
+        "name": "avatar",
+        "provenance": "captured",
+        "value": "30"
+      },
+      {
+        "name": "button",
+        "provenance": "captured",
+        "value": "12"
+      }
+    ],
+    "spacing": [
+      {
+        "name": "space2",
+        "provenance": "captured",
+        "value": "2"
+      },
+      {
+        "name": "space3",
+        "provenance": "captured",
+        "value": "3"
+      },
+      {
+        "name": "space4",
+        "provenance": "captured",
+        "value": "4"
+      },
+      {
+        "name": "space14",
+        "provenance": "captured",
+        "value": "14"
+      },
+      {
+        "name": "space18",
+        "provenance": "captured",
+        "value": "18"
+      },
+      {
+        "name": "space24",
+        "provenance": "captured",
+        "value": "24"
+      }
+    ],
+    "typography": [
+      {
+        "family": null,
+        "line_height": null,
+        "name": "- Name",
+        "provenance": "captured",
+        "size": "18",
+        "weight": "600"
+      },
+      {
+        "family": null,
+        "line_height": null,
+        "name": "- Role",
+        "provenance": "captured",
+        "size": "14",
+        "weight": "400"
+      },
+      {
+        "family": null,
+        "line_height": null,
+        "name": "- Stat value",
+        "provenance": "captured",
+        "size": "17",
+        "weight": "700"
+      },
+      {
+        "family": null,
+        "line_height": null,
+        "name": "- Stat label",
+        "provenance": "captured",
+        "size": "12",
+        "weight": "500"
+      },
+      {
+        "family": null,
+        "line_height": null,
+        "name": "- Avatar initials",
+        "provenance": "captured",
+        "size": "24",
+        "weight": "600"
+      },
+      {
+        "family": null,
+        "line_height": null,
+        "name": "- Button",
+        "provenance": "captured",
+        "size": "15",
+        "weight": "600"
+      }
+    ]
+  }
+}

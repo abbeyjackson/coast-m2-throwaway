@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; }
+  a { color: #0a84ff; text-decoration: none; }
+  a:hover { color: #0060df; }
+</style>
+</helmet>
+<div style="min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 40px; background: #f2f2f7; font-family: 'Inter', -apple-system, system-ui, sans-serif; box-sizing: border-box;">
+  <div style="width: 320px; background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 18px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="width: 60px; height: 60px; border-radius: 30px; background: linear-gradient(135deg, #0a84ff, #5e5ce6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px; font-weight: 600; flex-shrink: 0;">{{ initials }}</div>
+      <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+        <div style="font-size: 18px; font-weight: 600; color: #1c1c1e;">{{ name }}</div>
+        <div style="font-size: 14px; font-weight: 400; color: #8e8e93;">{{ role }}</div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 24px; padding: 4px 2px;">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 17px; font-weight: 700; color: #1c1c1e;">{{ posts }}</div>
+        <div style="font-size: 12px; font-weight: 500; color: #8e8e93;">Posts</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 17px; font-weight: 700; color: #1c1c1e;">{{ followers }}</div>
+        <div style="font-size: 12px; font-weight: 500; color: #8e8e93;">Followers</div>
+      </div>
+    </div>
+
+    <button onClick="{{ toggleFollow }}" style="{{ buttonStyle }}" style-active="transform: scale(0.98);">{{ buttonLabel }}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { following: false };
+  renderVals() {
+    const following = this.state.following;
+    const base = {
+      border: 'none',
+      borderRadius: '12px',
+      padding: '12px 0',
+      fontSize: '15px',
+      fontWeight: 600,
+      fontFamily: 'inherit',
+      cursor: 'pointer',
+      transition: 'transform 0.1s ease, background 0.2s ease',
+    };
+    const buttonStyle = following
+      ? { ...base, background: '#e5e5ea', color: '#1c1c1e' }
+      : { ...base, background: '#0a84ff', color: '#ffffff' };
+    return {
+      initials: 'AJ',
+      name: 'Abbey Jackson',
+      role: 'Product Builder',
+      posts: '128',
+      followers: '2.4k',
+      buttonLabel: following ? 'Following' : 'Follow',
+      buttonStyle,
+      toggleFollow: () => this.setState(s => ({ following: !s.following })),
+    };
+  }
+}
+</script>
+</body>
+</html>

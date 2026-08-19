@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; font-family: 'Inter', -apple-system, system-ui, sans-serif; background: #f2f2f7; }
+  .page { padding: 24px; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box; min-height: 100vh; }
+  .title { font-size: 18px; font-weight: 600; color: #1c1c1e; }
+  .label { font-size: 12px; font-weight: 500; color: #8e8e93; }
+  .option { border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 600; background: #e5e5ea; color: #1c1c1e; text-align: center; }
+  .picked { background: #0a84ff; color: #ffffff; }
+  .signoff { font-size: 14px; font-weight: 400; color: #8e8e93; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="title">Settings</div>
+  <div class="label">Home opens on</div>
+  <div class="option picked">Everyone</div>
+  <div class="option">Following</div>
+  <div class="option">New this month</div>
+  <div class="signoff">Goodbye, Abbey!</div>
+</div>
+</body>
+</html>
