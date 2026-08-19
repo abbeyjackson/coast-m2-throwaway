@@ -1,52 +1,25 @@
 {
   "bundle_schema_version": 1,
-  "bundle_version": 3,
+  "bundle_version": 1,
   "health": {
     "grade": "excellent",
     "warnings": []
   },
   "screens": [
     {
-      "content_hash": "sha256:9e5ab2d404182e03c767d67e6ee69ecbe1a224253a3ea747adc0d9b5d1ee5664",
-      "context": "design/screens/home/context.json",
-      "id": "home",
-      "name": "Home",
-      "platform_hint": "unknown",
-      "reference": "design/screens/home/reference.png",
-      "source_ref": "Home.html"
-    },
-    {
-      "content_hash": "sha256:74b64dd2ec6117a87797dbaf5061d8a47b07d449fbb227a4244e2e34b460bfb4",
-      "context": "design/screens/member-profile/context.json",
-      "id": "member-profile",
-      "name": "Member profile",
-      "platform_hint": "unknown",
-      "reference": "design/screens/member-profile/reference.png",
-      "source_ref": "Member profile.html"
-    },
-    {
       "content_hash": "sha256:09c36f1e78c12c24f7328379dea68dab123313dcdc18596093e11f63b20803c3",
-      "context": "design/screens/profile-card/context.json",
-      "id": "profile-card",
-      "name": "Profile card",
+      "context": "design/screens/profile-card-dc/context.json",
+      "id": "profile-card-dc",
+      "name": "ProfileCard.dc",
       "platform_hint": "unknown",
-      "reference": "design/screens/profile-card/reference.png",
-      "source_ref": "Profile card.html"
-    },
-    {
-      "content_hash": "sha256:fe8e28bac04add6fae5161326151e109694021900491e39e9af38fcaa55fc678",
-      "context": "design/screens/settings/context.json",
-      "id": "settings",
-      "name": "Settings",
-      "platform_hint": "unknown",
-      "reference": "design/screens/settings/reference.png",
-      "source_ref": "Settings.html"
+      "reference": "design/screens/profile-card-dc/reference.png",
+      "source_ref": "ProfileCard.dc.html"
     }
   ],
   "source": {
-    "imported_at": "2026-08-19T03:21:24.254Z",
+    "imported_at": "2026-07-22T21:40:20.709Z",
     "kind": "claude-design",
-    "name": "source",
+    "name": "Profile Card UI Element.zip",
     "url": null
   },
   "tokens": {

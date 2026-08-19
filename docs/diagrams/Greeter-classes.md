@@ -10,4 +10,7 @@ classDiagram
     class GreeterModule {
         <<enum>>
     }
+    class Theme {
+        <<enum>>
+    }
 ```
