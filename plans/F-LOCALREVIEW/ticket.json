@@ -1,0 +1,6 @@
+{
+  "description": "Add a Farewell service to the Greeter module: a public type in Sources/Greeter/Greeter.swift with farewell(name:) returning a goodbye string. Verifies the local-review path end to end.",
+  "feature_id": "F-LOCALREVIEW",
+  "ticket_ref": "LR-1",
+  "ticket_schema_version": 1
+}

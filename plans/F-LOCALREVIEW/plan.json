@@ -1,0 +1,35 @@
+{
+  "acceptance_criteria": [
+    {
+      "given": "a Greeter",
+      "then": "it returns \"Hello, Abbey!\"",
+      "when": "greet(name: \"Abbey\") is called"
+    },
+    {
+      "given": "a Greeter",
+      "then": "it returns \"Hello, world!\"",
+      "when": "greet() is called"
+    }
+  ],
+  "base_commit": "39fc19da0f295af07a7a0eecbffdd792329c2ccd",
+  "db_change": false,
+  "declared_scope": [
+    "Sources/Greeter/**",
+    "Tests/GreeterTests/**",
+    "docs/features/F-LOCALREVIEW/**"
+  ],
+  "feature_id": "F-LOCALREVIEW",
+  "items": [
+    {
+      "content_hash": "sha256:1f82a4318f9ba227ffc178035635e69f8c25690ce23cb0fb8fbb0084d004576b",
+      "description": "Public Greeter service with greet(name:) and greet(), revised per rejection causes",
+      "item_id": "F-LOCALREVIEW-i001",
+      "kind": "type",
+      "sensitive": false,
+      "target": "Sources/Greeter/Greeter.swift"
+    }
+  ],
+  "plan_schema_version": 1,
+  "plan_version": 1,
+  "ticket_ref": "LR-1"
+}

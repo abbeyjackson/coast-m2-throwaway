@@ -582,8 +582,20 @@ def main():
         ok("check3")
 
     # ---- Check 4 — chain integrity ----------------------------------------
+    # The plan-bar approval history walks the same chain rules as item
+    # histories (it is recorded by the same ledger write: first trigger
+    # "initial", later verdicts supersede an earlier approval_id), and its
+    # approval_ids join the file-wide uniqueness set.
+    # (Non-dict junk elements are dropped here rather than skipping the walk —
+    # a malformed list can't dodge the chain rules; check 3 fails the shape
+    # itself on implementation PRs.)
+    chain_entries = proof["items"] + proof.get("superseded_items", [])
+    if isinstance(proof.get("plan_approval"), list):
+        chain_entries = chain_entries + [{
+            "item_id": "plan",
+            "verdicts": [v for v in proof["plan_approval"] if isinstance(v, dict)]}]
     seen_approval_ids = set()
-    for entry in proof["items"] + proof.get("superseded_items", []):
+    for entry in chain_entries:
         verdicts = entry.get("verdicts", [])
         expected_first = "drift" if entry.get("origin") == "drift" else "initial"
         prior_ids = set()
@@ -632,6 +644,39 @@ def main():
                     fail("check8", aid or "?", "verdict present in predecessor missing from new proof")
                 elif new_verdicts[aid] != canonical(verdict):
                     fail("check8", aid, "verdict bytes altered against predecessor")
+        # The plan-bar approval record gets the SAME superset rule. plans/ is
+        # agent-writable, so without this an agent commit editing proof.json
+        # could drop, replace, or alter the plan_approval history — including
+        # the approved_native_deviations the native-pattern gate trusts
+        # (check_native_patterns.py reads this record at PR head; both gates
+        # run in the same required workflow, so this check protects that read
+        # too). Once a predecessor proof carries a plan-bar verdict, every
+        # later proof must carry it byte-identically. This closes DROP,
+        # REPLACE, and ALTER. Residual, stated plainly: it does NOT close
+        # APPEND — a forged verdict appended with a valid chain shape
+        # (trigger rejection-revision, superseding the genuine approval_id,
+        # binding this plan file's hash) passes checks 3/4/8 and becomes the
+        # operative verdict, and a first-time plan_approval where the
+        # predecessor had none is likewise indistinguishable from Coast's
+        # own export. No pure function of the trees can tell those from a
+        # legitimate re-approval; full closure means SHA-pinning Coast's
+        # assembly commit at the merge gate (the app knows the SHA it
+        # pushed) — the documented follow-up, deliberately not built here.
+        new_plan_verdicts = {}
+        if isinstance(proof.get("plan_approval"), list):
+            for verdict in proof["plan_approval"]:
+                if isinstance(verdict, dict):
+                    new_plan_verdicts[verdict.get("approval_id")] = canonical(verdict)
+        old_plan_approval = old.get("plan_approval")
+        if isinstance(old_plan_approval, list):
+            for verdict in old_plan_approval:
+                if not isinstance(verdict, dict):
+                    continue
+                aid = verdict.get("approval_id")
+                if aid not in new_plan_verdicts:
+                    fail("check8", aid or "?", "plan-bar verdict present in predecessor missing from new proof")
+                elif new_plan_verdicts[aid] != canonical(verdict):
+                    fail("check8", aid, "plan-bar verdict bytes altered against predecessor")
     if not [f for f in failures if f["check"] == "check8"]:
         ok("check8", "no predecessor" if old_raw is None else "superset holds")
 
