@@ -1,6 +1,6 @@
 {
   "bundle_schema_version": 1,
-  "bundle_version": 5,
+  "bundle_version": 4,
   "health": {
     "grade": "excellent",
     "warnings": []
@@ -44,9 +44,9 @@
     }
   ],
   "source": {
-    "imported_at": "2026-08-19T03:32:18.761Z",
+    "imported_at": "2026-08-19T03:27:36.667Z",
     "kind": "claude-design",
-    "name": "Team Directory handoff",
+    "name": "source",
     "url": null
   },
   "tokens": {
